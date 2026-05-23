@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IFMG Horários - Gestão Empresarial</title>
+    <style>
+        /* Importação da fonte moderna 'Poppins' */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+        /* --- Variáveis de Cores (Paleta Oficial IFMG baseada em image_1.png) --- */
+        :root {
+            --ifmg-green: #28A745; /* Verde Brilhante do Logo IF */
+            --ifmg-red: #DC3545; /* Vermelho do Ponto do Logo */
+            --ifmg-dark-grey: #333333; /* Texto Principal */
+            --ifmg-light-grey: #f8f8f8; /* Fundo do Site (levemente cinza, como no logo) */
+            --ifmg-light-green: #d1e7dd; /* Borda e Hover Suave */
+            --ifmg-light-yellow: #ffdddd; /* Almoço */
+            --ifmg-border-color: #e0e0e0;
+            --card-bg: #ffffff;
+            --text-light: #7f8c8d;
+            
+            /* Sombra suave e moderna */
+            --shadow: 0 15px 35px rgba(33, 136, 56, 0.1);
+            --shadow-subtle: 0 4px 10px rgba(33, 136, 56, 0.05);
+        }
+
+        * { 
+            box-sizing: border-box; 
+            font-family: 'Poppins', sans-serif; 
+            margin: 0;
+            padding: 0;
+        }
+
+        body { 
+            background: linear-gradient(135deg, var(--ifmg-light-grey) 0%, #ffffff 100%);
+            min-height: 100vh;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            color: var(--ifmg-dark-grey);
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        /* --- Definições de Animações CSS --- */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleUp {
+            from { transform: scale(0.9) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        /* --- Container Principal (Centralizador) --- */
+        #main-container {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* --- Estilização dos Cards (Login e App) --- */
+        .card { 
+            width: 100%; 
+            background: var(--card-bg); 
+            border-radius: 20px; 
+            box-shadow: var(--shadow);
+            border: 1px solid var(--ifmg-border-color);
+            transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+            animation: fadeIn 0.4s ease-out; /* Animação ao carregar */
+        }
+
+        /* --- TELA DE LOGIN (Design Moderno e Institucional) --- */
+        #login-screen { 
+            max-width: 480px; 
+            padding: 50px 40px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            animation: scaleUp 0.5s ease-out; /* Animação específica de login */
+        }
+
+        /* Elemento decorativo visual no topo do login com ponto vermelho central */
+        #login-screen::before {
+            content: '';
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle at 50% 50%, var(--ifmg-red) 15%, transparent 16%), linear-gradient(135deg, var(--ifmg-green), var(--ifmg-green));
+            border-radius: 50%;
+            position: absolute;
+            top: -60px;
+            z-index: -1;
+            opacity: 0.15;
+        }
+
+        #login-screen h2 { 
+            color: var(--ifmg-green); 
+            margin-bottom: 10px; 
+            font-weight: 700; 
+            font-size: 26px;
+            letter-spacing: -0.5px;
+        }
+        
+        #login-screen h2 span { color: var(--ifmg-red); } /* Para o ponto do 'i' */
+
+        #login-screen .sub-h2 {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-bottom: 35px;
+            text-align: center;
+        }
+
+        .form-group { width: 100%; margin-bottom: 25px; position: relative; }
+        
+        /* Input fields estilizados com foco no verde IFMG */
+        input { 
+            width: 100%; 
+            padding: 16px 20px 16px 50px; /* Espaço para o "ícone" implícito */
+            border: 2px solid #e1e4e8; 
+            border-radius: 12px; 
+            font-size: 15px; 
+            color: var(--ifmg-dark-grey);
+            background-color: #fafbfc;
+            transition: all 0.2s ease;
+        }
+
+        /* Simulação de ícone simples via CSS no placeholder (opcional) */
+        input#username { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%237f8c8d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>'); background-repeat: no-repeat; background-position: 18px 18px; }
+        input#password { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%237f8c8d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>'); background-repeat: no-repeat; background-position: 18px 18px; }
+
+        input:focus {
+            outline: none;
+            border-color: var(--ifmg-green);
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(40, 167, 69, 0.1);
+        }
+
+        /* Botão Principal Verde IFMG com animação sutil e tom mais escuro */
+        button { 
+            width: 100%; 
+            padding: 16px; 
+            background: linear-gradient(135deg, var(--ifmg-green) 0%, #1e7e34 100%);
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            font-size: 16px; 
+            font-weight: 600;
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.2);
+        }
+        
+        button:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 25px rgba(40, 167, 69, 0.3);
+        }
+        
+        button:active { transform: translateY(1px); }
+
+        .help-text { font-size: 12px; color: var(--text-light); margin-top: 10px; display: block; text-align: center; }
+
+        /* --- TELA PRINCIPAL (Quadro de Horários) --- */
+        #app-screen { 
+            display: none; 
+            padding: 30px; 
+            animation: fadeIn 0.5s ease-out; 
+            align-self: flex-start; /* Para não centralizar verticalmente */
+        }
+
+        /* Header do App estilizado */
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 25px; 
+            padding-bottom: 15px; 
+            border-bottom: 2px solid var(--ifmg-border-color); 
+        }
+        .header h3 { margin: 0; color: var(--ifmg-dark-grey); font-weight: 600; font-size: 18px; }
+        
+        .logout-btn { 
+            background: #fff;
+            color: #d73a49;
+            border: 1px solid var(--ifmg-border-color);
+            width: auto; 
+            padding: 8px 16px; 
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: none;
+            border-radius: 8px;
+        }
+        .logout-btn:hover { background-color: #ffeef0; color: #cb2431; box-shadow: var(--shadow-subtle); transform: none; }
+
+        /* --- Tabela Estilizada (Paleta IFMG Verde e Branco) --- */
+        table { 
+            width: 100%; 
+            border-collapse: separate; 
+            border-spacing: 0;
+            margin-bottom: 30px; 
+            text-align: center; 
+            border-radius: 12px;
+            overflow: hidden; /* Para as bordas arredondadas funcionarem */
+            border: 1px solid var(--ifmg-border-color);
+            box-shadow: var(--shadow-subtle);
+        }
+        
+        th, td { 
+            padding: 14px 10px; 
+            font-size: 14px;
+            transition: all 0.2s ease;
+            border-right: 1px solid var(--ifmg-border-color);
+            border-bottom: 1px solid var(--ifmg-border-color);
+        }
+        
+        th:last-child, td:last-child { border-right: none; }
+        tr:last-child td { border-bottom: none; }
+
+        /* Cabeçalho da Tabela - Verde Sólido IFMG com Texto Branco */
+        th { 
+            background-color: var(--ifmg-green); 
+            color: white; 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            font-size: 12px; 
+            letter-spacing: 1px;
+            padding: 16px;
+        }
+
+        /* Coluna de horários cinza claro */
+        td.time-column {
+            font-weight: 600;
+            background-color: #f1f1f1;
+            color: var(--ifmg-dark-grey);
+            width: 100px;
+        }
+        
+        /* Células comuns - Brancas com tom sutil de cinza nas pares */
+        td { background-color: #ffffff; }
+        
+        tr:nth-child(even) td:not(.time-column) { background-color: #fdfdfd; }
+
+        /* Efeito de hover verde IFMG suave para editável */
+        .editable { cursor: pointer; color: var(--ifmg-dark-grey); }
+        .editable:hover { 
+            background-color: var(--ifmg-light-green) !important; 
+            box-shadow: inset 0 0 0 3px var(--ifmg-green); /* Borda interna no verde oficial */
+            transform: scale(1.02); /* Leve crescimento */
+            z-index: 10;
+        }
+        
+        /* Célula de Almoço - Amarelinho (mantido) */
+        .lunch { background-color: var(--ifmg-light-yellow) !important; font-weight: 600; color: #7d0808; cursor: not-allowed; }
+
+        /* --- Logs - Histórico de Alterações (com badges coloridas) --- */
+        h3 { margin-bottom: 15px; color: var(--ifmg-dark-grey); font-size: 16px; font-weight: 600; }
+        
+        .logs-container { 
+            background: #fafbfc; 
+            border: 1px solid var(--ifmg-border-color); 
+            padding: 10px 15px; 
+            border-radius: 12px; 
+            max-height: 200px; 
+            overflow-y: auto; 
+            box-shadow: var(--shadow-subtle);
+        }
+        
+        .log-item { 
+            font-size: 13px; 
+            padding: 10px 0; 
+            border-bottom: 1px solid #eaecef; 
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+        }
+        .log-item:last-child { border-bottom: none; }
+        
+        /* Badge estilizada para data e hora no Vermelho do Ponto do Logo */
+        .log-time { 
+            background: var(--ifmg-red);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px; 
+            margin-right: 10px; 
+            font-weight: 500;
+            font-family: monospace; 
+        }
+        .log-user { color: var(--ifmg-dark-grey); font-weight: 600; margin-right: 5px; }
+
+        /* Responsividade para Celulares */
+        @media (max-width: 600px) {
+            body { padding: 10px; align-items: flex-start; }
+            #login-screen, #app-screen { padding: 25px 20px; border-radius: 15px; }
+            #login-screen h2 { font-size: 22px; }
+            input { padding: 14px 15px 14px 45px; }
+            table { font-size: 12px; }
+            th, td { padding: 8px 5px; }
+            .header { flex-direction: column; text-align: center; gap: 10px; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="main-container">
+        
+        <div id="login-screen" class="card">
+            <h2>IFMG Horár<span>i</span>os</h2>
+            <p class="sub-h2">Acesse o quadro de horários da sua turma na plataforma oficial.</p>
+            <div class="form-group">
+                <input type="text" id="username" placeholder="E-mail (@ifmg.edu.br) ou Matrícula">
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" placeholder="Sua senha">
+            </div>
+            <button onclick="realizarLogin()">Entrar</button>
+            <span class="help-text">Professores: usem email institucional. Alunos: usem 7 números.</span>
+        </div>
+
+        <div id="app-screen" class="card">
+            <div class="header">
+                <h3 id="welcome-message">Carregando...</h3>
+                <button class="logout-btn" onclick="fazerLogout()">Sair</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Horário</th>
+                        <th>Seg</th>
+                        <th>Ter</th>
+                        <th>Qua</th>
+                        <th>Qui</th>
+                        <th>Sex</th>
+                    </tr>
+                </thead>
+                <tbody id="schedule-body">
+                    </tbody>
+            </table>
+
+            <h3>📋 Histórico da Semana</h3>
+            <div class="logs-container" id="logs-list">
+                Nenhuma alteração registrada.
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // O horário original extraído da sua imagem
+        const horarioOriginal = [
+            ["07:30", "matemática", "biologia", "história", "português", "projeto integrador"],
+            ["09:40", "física", "projeto integrador", "sociologia", "inglês", "educação física"],
+            ["11:00", "almoço", "almoço", "almoço", "almoço", "almoço"],
+            ["13:00", "geografia", "redação", "-", "química", "gestão empresarial"],
+            ["14:40", "matemática", "planejamento e orçamento", "-", "instalações elétricas", "instalações hidráulicas"]
+        ];
+
+        const diasSemana = ["", "Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
+        let horarioAtual = [];
+        let logs = [];
+        let usuarioLogado = null;
+
+        // Inicialização do sistema
+        function iniciarSistema() {
+            verificarResetSabado();
+            
+            // Carrega dados salvos no localStorage ou usa o original
+            const horarioSalvo = localStorage.getItem('horarioAtual_IFMG');
+            horarioAtual = horarioSalvo ? JSON.parse(horarioSalvo) : JSON.parse(JSON.stringify(horarioOriginal));
+            
+            const logsSalvos = localStorage.getItem('logsAuditoria_IFMG');
+            logs = logsSalvos ? JSON.parse(logsSalvos) : [];
+        }
+
+        // Lógica de Reset Automático no Sábado
+        function verificarResetSabado() {
+            const hoje = new Date();
+            const diaSemana = hoje.getDay(); // 0 é Domingo, 6 é Sábado
+            const dataAtualString = hoje.toDateString();
+            const ultimoReset = localStorage.getItem('ultimoReset_IFMG');
+
+            if (diaSemana === 6 && ultimoReset !== dataAtualString) {
+                // Apaga os dados modificados do localStorage
+                localStorage.removeItem('horarioAtual_IFMG');
+                localStorage.removeItem('logsAuditoria_IFMG');
+                localStorage.setItem('ultimoReset_IFMG', dataAtualString);
+                console.log("Horário resetado para o padrão (Sábado).");
+            }
+        }
+
+        // Sistema de Login Combinado (com animação de transição)
+        function realizarLogin() {
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            const loginScreen = document.getElementById('login-screen');
+            const appScreen = document.getElementById('app-screen');
+
+            if (!user || !pass) {
+                alert("Por favor, preencha todos os campos.");
+                return;
+            }
+
+            const isTeacher = user.endsWith('@ifmg.edu.br');
+            const isStudent = /^\d{7}$/.test(user);
+
+            if (isTeacher) {
+                usuarioLogado = { id: user, role: 'teacher' };
+            } else if (isStudent) {
+                usuarioLogado = { id: user, role: 'student' };
+            } else {
+                alert("Acesso Negado.\nUse email @ifmg.edu.br (Professor)\nou 7 números da matrícula (Aluno).");
+                return;
+            }
+
+            // Inicia a transição de transição
+            // 1. Aplica animação de saída na tela de login
+            loginScreen.style.transform = 'scale(1.1)';
+            loginScreen.style.opacity = '0';
+            
+            // 2. Aguarda a animação de saída acabar (500ms) para trocar de tela
+            setTimeout(() => {
+                loginScreen.style.display = 'none';
+                appScreen.style.display = 'block';
+                
+                // Reinicia os estilos de login para o próximo uso
+                loginScreen.style.transform = 'scale(1)';
+                loginScreen.style.opacity = '1';
+
+                let tipoUser = isTeacher ? "Professor(a)" : "Aluno(a)";
+                document.getElementById('welcome-message').innerText = `${tipoUser}: ${user}`;
+                
+                // Gera a tabela e os logs
+                renderizarTabela();
+                renderizarLogs();
+            }, 500);
+        }
+
+        function fazerLogout() {
+            usuarioLogado = null;
+            const loginScreen = document.getElementById('login-screen');
+            const appScreen = document.getElementById('app-screen');
+
+            // Aplica animação de saída na tela principal
+            appScreen.style.opacity = '0';
+
+            setTimeout(() => {
+                appScreen.style.display = 'none';
+                loginScreen.style.display = 'flex';
+                appScreen.style.opacity = '1'; // Reseta opacidade para o próximo login
+
+                // Limpa os campos de senha
+                document.getElementById('password').value = '';
+            }, 300);
+        }
+
+        // Geração Dinâmica do Horário na Tabela (com paleta IFMG)
+        function renderizarTabela() {
+            const tbody = document.getElementById('schedule-body');
+            tbody.innerHTML = '';
+
+            horarioAtual.forEach((linha, indiceLinha) => {
+                let tr = document.createElement('tr');
+                
+                linha.forEach((celula, indiceColuna) => {
+                    let td = document.createElement('td');
+                    td.innerText = celula;
+
+                    // Coluna de horário (07:30) - Estilo especial cinza
+                    if (indiceColuna === 0) {
+                        td.className = 'time-column';
+                    } 
+                    // Regra para almoço (imutável e amarela)
+                    else if (celula === 'almoço') {
+                        td.className = 'lunch';
+                    } 
+                    // Regra para edição (apenas se for professor, com hover verde IFMG suave)
+                    else if (usuarioLogado && usuarioLogado.role === 'teacher') {
+                        td.className = 'editable';
+                        td.title = "Clique para alterar esta disciplina";
+                        td.onclick = () => editarHorario(indiceLinha, indiceColuna);
+                    }
+
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Lógica de Edição para Professores via Prompt
+        function editarHorario(linha, coluna) {
+            const materiaAntiga = horarioAtual[linha][coluna];
+            const dia = diasSemana[coluna];
+            const hora = horarioAtual[linha][0];
+
+            // Pede ao professor a nova disciplina
+            const novaMateria = prompt(`Editando ${dia} às ${hora}.\nDigite o novo nome (ou deixe em branco para '-' )`, materiaAntiga);
+
+            if (novaMateria !== null && novaMateria !== materiaAntiga) {
+                const textoFinal = novaMateria.trim() === "" ? "-" : novaMateria.trim();
+                
+                // Atualiza o horário atual
+                horarioAtual[linha][coluna] = textoFinal;
+                
+                // Registra no histórico de auditoria
+                registrarLog(dia, hora, materiaAntiga, textoFinal);
+                
+                // Salva localmente e atualiza a visualização
+                salvarDados();
+                renderizarTabela();
+            }
+        }
+
+        // Sistema de Auditoria (Registro de Logs)
+        function registrarLog(dia, hora, antigo, novo) {
+            const dataHora = new Date().toLocaleString('pt-BR');
+            const mensagem = `Alterou ${dia} ${hora}: de "${antigo}" para "${novo}"`;
+            
+            // Adiciona no início da lista para mostrar as mais recentes primeiro
+            logs.unshift({ 
+                data: dataHora,
+                usuario: usuarioLogado.id,
+                msg: mensagem
+            });
+
+            renderizarLogs();
+        }
+
+        // Geração Dinâmica da Lista de Logs (com badges no Vermelho IFMG)
+        function renderizarLogs() {
+            const container = document.getElementById('logs-list');
+            container.innerHTML = '';
+
+            if (logs.length === 0) {
+                container.innerHTML = '<div style="font-size:12px; color:#7f8c8d; padding:10px;">Nenhuma alteração registrada nesta semana.</div>';
+                return;
+            }
+
+            logs.forEach(log => {
+                let div = document.createElement('div');
+                div.className = 'log-item';
+                div.innerHTML = `<span class="log-time">${log.data}</span> <span class="log-user">@${log.usuario.split('@')[0]}</span>: ${log.msg}`;
+                container.appendChild(div);
+            });
+        }
+
+        // Salva os dados no localStorage para persistência
+        function salvarDados() {
+            localStorage.setItem('horarioAtual_IFMG', JSON.stringify(horarioAtual));
+            localStorage.setItem('logsAuditoria_IFMG', JSON.stringify(logs));
+        }
+
+        // Inicia o sistema ao carregar o arquivo
+        iniciarSistema();
+    </script>
+</body>
+</html>
