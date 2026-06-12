@@ -3,25 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>IFMG | Gestão de Horários</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
         :root { --primary: #28a745; --bg: #f8f9fa; }
         body { font-family: 'Poppins', sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
-        
-        /* Login */
         #login-screen { background: #fff; padding: 30px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 350px; text-align: center; }
-        
-        /* App */
         #app-screen { display: none; width: 100%; max-width: 900px; background: #fff; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #eee; border-radius: 12px; box-sizing: border-box; }
-        button { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 12px; cursor: pointer; width: 100%; font-weight: 600; margin-top: 10px; }
-        
-        /* Tabela */
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #eee; border-radius: 12px; }
+        button { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 12px; cursor: pointer; width: 100%; font-weight: 600; }
         table { width: 100%; border-collapse: collapse; margin: 20px 0; }
         td, th { padding: 12px; border: 1px solid #eee; text-align: center; }
         .editable { width: 90%; padding: 6px; border: 1px solid #ccc; border-radius: 5px; text-align: center; }
-        
-        /* Chat */
         .msg { background: #f1f8f3; padding: 12px; border-radius: 10px; margin: 10px 0; border-left: 5px solid var(--primary); position: relative; text-align: left; }
         .delete-btn { position: absolute; right: 10px; top: 10px; color: #dc3545; cursor: pointer; font-size: 12px; }
     </style>
@@ -29,7 +23,7 @@
 <body>
 
     <div id="login-screen">
-        <h2 style="color: var(--primary);">Login</h2>
+        <h2>Login</h2>
         <input type="text" id="username" placeholder="E-mail institucional">
         <input type="password" id="password" placeholder="Senha">
         <button onclick="realizarLogin()">Entrar</button>
@@ -37,19 +31,18 @@
 
     <div id="app-screen">
         <h2>Quadro de Horários</h2>
-        <select id="turma-selector" onchange="renderizarTabela()">
+        <select id="turma-selector" onchange="carregarTudo()">
             <option value="1A">1º Ano A</option><option value="1B">1º Ano B</option>
             <option value="2A">2º Ano A</option><option value="2B">2º Ano B</option>
             <option value="3A">3º Ano A</option><option value="3B">3º Ano B</option>
         </select>
-        
         <table>
             <thead><tr><th>Horário</th><th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th></tr></thead>
             <tbody id="schedule-body"></tbody>
         </table>
-        <button id="save-btn" onclick="salvarAlteracoes()" style="display:none;">💾 Salvar Alterações</button>
+        <button id="save-btn" onclick="salvarTabela()" style="display:none;">💾 Salvar Alterações</button>
 
-        <div style="margin-top:40px; text-align:left;">
+        <div style="margin-top:40px;">
             <h3>💬 Mural de Avisos</h3>
             <input type="text" id="msg-input" placeholder="Escreva um aviso...">
             <button onclick="enviarMensagem()">Publicar</button>
@@ -58,34 +51,58 @@
     </div>
 
 <script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyD5uAaur9-2AQpgcNESok2MzvsM7o_UpHE",
+        authDomain: "ifmghorarios.firebaseapp.com",
+        projectId: "ifmghorarios",
+        storageBucket: "ifmghorarios.firebasestorage.app",
+        messagingSenderId: "901251043930",
+        appId: "1:901251043930:web:e0a638283c73f3b3287e63"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
     let user = { id: '', role: '' };
-    const base = [
-        ["07:30", "-", "-", "-", "-", "-"], ["09:40", "-", "-", "-", "-", "-"],
-        ["11:00", "Almoço", "Almoço", "Almoço", "Almoço", "Almoço"],
-        ["13:00", "-", "-", "-", "-", "-"], ["14:40", "-", "-", "-", "-", "-"]
-    ];
+    const padrao = [["07:30","-","-","-","-","-"],["09:40","-","-","-","-","-"],["11:00","Almoço","Almoço","Almoço","Almoço","Almoço"],["13:00","-","-","-","-","-"],["14:40","-","-","-","-","-"]];
 
     function realizarLogin() {
         user.id = document.getElementById('username').value;
-        if(!user.id) return alert("Preencha o e-mail");
         user.role = user.id.endsWith('@ifmg.edu.br') ? 'teacher' : 'student';
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-screen').style.display = 'block';
         if(user.role === 'teacher') document.getElementById('save-btn').style.display = 'block';
-        renderizarTabela();
+        carregarTudo();
     }
 
-    function renderizarTabela() {
+    function carregarTudo() {
         const turma = document.getElementById('turma-selector').value;
-        const body = document.getElementById('schedule-body');
-        body.innerHTML = '';
-        const data = JSON.parse(localStorage.getItem('horario_' + turma)) || base;
+        console.log("Carregando dados da:", turma);
         
-        data.forEach((row, l) => {
+        db.collection("horarios").doc(turma).get()
+        .then(doc => {
+            renderizarTabela(doc.exists ? doc.data().dados : padrao);
+        })
+        .catch(err => {
+            console.error("Erro:", err);
+            renderizarTabela(padrao);
+        });
+        
+        db.collection("chat").where("turma", "==", turma).onSnapshot(snap => {
+            const list = document.getElementById('chat-list'); list.innerHTML = '';
+            snap.forEach(doc => {
+                const m = doc.data();
+                list.innerHTML += `<div class="msg"><b>${m.user}</b><br>${m.text}<span class="delete-btn" onclick="apagarMensagem('${doc.id}')">Apagar</span></div>`;
+            });
+        });
+    }
+
+    function renderizarTabela(data) {
+        const body = document.getElementById('schedule-body'); body.innerHTML = '';
+        data.forEach(row => {
             let tr = document.createElement('tr');
             row.forEach((cell, c) => {
                 let td = document.createElement('td');
-                if (c > 0 && cell !== "Almoço" && user.role === 'teacher') {
+                if (user.role === 'teacher' && c > 0 && cell !== "Almoço") {
                     td.innerHTML = `<input class="editable" value="${cell}">`;
                 } else {
                     td.innerText = cell;
@@ -94,39 +111,9 @@
             });
             body.appendChild(tr);
         });
-        renderizarChat();
     }
 
-    function enviarMensagem() {
-        const turma = document.getElementById('turma-selector').value;
-        const msg = document.getElementById('msg-input').value;
-        if(!msg) return;
-        let chat = JSON.parse(localStorage.getItem('chat_' + turma) || '[]');
-        chat.push({ user: user.id, text: msg });
-        localStorage.setItem('chat_' + turma, JSON.stringify(chat));
-        document.getElementById('msg-input').value = '';
-        renderizarChat();
-    }
-
-    function renderizarChat() {
-        const turma = document.getElementById('turma-selector').value;
-        const list = document.getElementById('chat-list');
-        const chat = JSON.parse(localStorage.getItem('chat_' + turma) || '[]');
-        list.innerHTML = chat.map((m, index) => `
-            <div class="msg"><b>${m.user}</b><br>${m.text}
-            <span class="delete-btn" onclick="apagarMensagem(${index})">Apagar</span></div>
-        `).join('');
-    }
-
-    function apagarMensagem(index) {
-        const turma = document.getElementById('turma-selector').value;
-        let chat = JSON.parse(localStorage.getItem('chat_' + turma) || '[]');
-        chat.splice(index, 1);
-        localStorage.setItem('chat_' + turma, JSON.stringify(chat));
-        renderizarChat();
-    }
-
-    function salvarAlteracoes() { 
+    function salvarTabela() {
         const turma = document.getElementById('turma-selector').value;
         let novo = [];
         document.querySelectorAll('#schedule-body tr').forEach(tr => {
@@ -134,9 +121,17 @@
             tr.querySelectorAll('td').forEach(td => row.push(td.querySelector('input') ? td.querySelector('input').value : td.innerText));
             novo.push(row);
         });
-        localStorage.setItem('horario_' + turma, JSON.stringify(novo));
-        alert("Alterações salvas com sucesso!");
+        db.collection("horarios").doc(turma).set({ dados: novo }).then(() => alert("Salvo!"));
     }
+
+    function enviarMensagem() {
+        const turma = document.getElementById('turma-selector').value;
+        const msg = document.getElementById('msg-input').value;
+        if(msg) db.collection("chat").add({ turma, user: user.id, text: msg });
+        document.getElementById('msg-input').value = '';
+    }
+
+    function apagarMensagem(id) { db.collection("chat").doc(id).delete(); }
 </script>
 </body>
 </html>
