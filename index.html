@@ -76,17 +76,9 @@
 
     function carregarTudo() {
         const turma = document.getElementById('turma-selector').value;
-        console.log("Carregando dados da:", turma);
-        
-        db.collection("horarios").doc(turma).get()
-        .then(doc => {
+        db.collection("horarios").doc(turma).get().then(doc => {
             renderizarTabela(doc.exists ? doc.data().dados : padrao);
-        })
-        .catch(err => {
-            console.error("Erro:", err);
-            renderizarTabela(padrao);
         });
-        
         db.collection("chat").where("turma", "==", turma).onSnapshot(snap => {
             const list = document.getElementById('chat-list'); list.innerHTML = '';
             snap.forEach(doc => {
@@ -121,7 +113,7 @@
             tr.querySelectorAll('td').forEach(td => row.push(td.querySelector('input') ? td.querySelector('input').value : td.innerText));
             novo.push(row);
         });
-        db.collection("horarios").doc(turma).set({ dados: novo }).then(() => alert("Salvo!"));
+        db.collection("horarios").doc(turma).set({ dados: novo }).then(() => alert("Salvo no banco de dados!"));
     }
 
     function enviarMensagem() {
